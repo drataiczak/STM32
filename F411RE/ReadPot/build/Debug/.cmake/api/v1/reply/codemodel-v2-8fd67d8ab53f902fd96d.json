@@ -10,7 +10,7 @@
 					[
 						1
 					],
-					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.22"
@@ -24,7 +24,7 @@
 				},
 				{
 					"build" : "cmake/stm32cubemx",
-					"jsonFile" : "directory-cmake.stm32cubemx-Debug-a874d3cc84b5982fda2e.json",
+					"jsonFile" : "directory-cmake.stm32cubemx-Debug-4b19649788072bcc790a.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.22"
@@ -46,7 +46,7 @@
 					[
 						0
 					],
-					"name" : "HelloWorld",
+					"name" : "ReadPot",
 					"targetIndexes" : 
 					[
 						0
@@ -65,9 +65,9 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "HelloWorld::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-HelloWorld-Debug-8fa4c45e690a95de54e3.json",
-					"name" : "HelloWorld",
+					"id" : "ReadPot::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ReadPot-Debug-3a046239e71606ed5452.json",
+					"name" : "ReadPot",
 					"projectIndex" : 0
 				}
 			]
@@ -76,8 +76,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "Z:/Documents/STM32/F411RE/HelloWorld/build/Debug",
-		"source" : "Z:/Documents/STM32/F411RE/HelloWorld"
+		"build" : "/Users/drataiczak/Documents/STM32/F411RE/ReadPot/build/Debug",
+		"source" : "/Users/drataiczak/Documents/STM32/F411RE/ReadPot"
 	},
 	"version" : 
 	{

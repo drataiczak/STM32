@@ -64,23 +64,23 @@
 			[
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Core/Inc"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Core/Inc"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
 				}
 			],
 			"language" : "C",
@@ -144,23 +144,23 @@
 			[
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Core/Inc"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Core/Inc"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"
 				},
 				{
 					"backtrace" : 2,
-					"path" : "Z:/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
+					"path" : "/Users/drataiczak/Documents/STM32/F411RE/HelloWorld/cmake/stm32cubemx/../../Drivers/CMSIS/Include"
 				}
 			],
 			"language" : "ASM",

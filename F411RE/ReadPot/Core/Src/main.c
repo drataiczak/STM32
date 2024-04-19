@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <string.h>
 #include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
@@ -45,6 +44,16 @@
 ADC_HandleTypeDef hadc1;
 
 UART_HandleTypeDef huart2;
+
+#ifdef __GNUC__
+    #define _PUTCHAR int __io_putchar(int ch)
+#else
+    #define _PUTCHAR int fputc(int ch, FILE *f)
+#endif
+
+_PUTCHAR {
+  HAL_UART_Transmit(&huart2, (uint8_t *) &ch, 1, HAL_MAX_DELAY);
+}
 
 /* USER CODE BEGIN PV */
 
@@ -102,16 +111,18 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint16_t val;
-  char buffer[10];
+  float voltVal = 0;
   while (1)
   {
     /* USER CODE END WHILE */
     HAL_ADC_Start(&hadc1);
     HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
     val = HAL_ADC_GetValue(&hadc1);
+    voltVal = (3.3 / 4096) * val;
     
-    sprintf(buffer, "%hu\r\n", val);
-    HAL_UART_Transmit(&huart2, (uint8_t *) val, strnlen(val, sizeof(buffer)), HAL_MAX_DELAY);
+    printf("Value of ADC peripheral: %04d\r\n", val);
+    printf("Pot voltage: %01.01fV\r\n", voltVal);
+    HAL_Delay(5000);
         /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
