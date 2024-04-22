@@ -1,14 +1,29 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
-#define ADC_SAMPLES 10
-#define ADC_CHANNELS 2
-#define ADC_RES 4095
-#define ADC_INTREF 1.21
+#include <stdio.h>
 
 #ifdef __GNUC__
     #define _PUTCHAR int __io_putchar(int ch)
@@ -16,21 +31,32 @@
     #define _PUTCHAR int fputc(int ch, FILE *f)
 #endif
 
+#define ADC_SAMPLES 10
+#define ADC_CHANNELS 2
+#define ADC_RESOLUTION 4095
+
 _PUTCHAR {
   HAL_UART_Transmit(&huart2, (uint8_t *) &ch, 1, HAL_MAX_DELAY);
+  return 1;
 }
 
-typedef struct TempPair {
-  float temp;
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+void processADCBuf(uint16_t *buffer);
+void calibrateTempSensor();
+
+typedef struct {
+  float vdda;
   float vref;
+  float temp;
+  uint16_t vrefAvg;
+  uint16_t tempAvg;
 } temp_t;
 
-/* Create dma buffer */
-uint16_t buf[ADC_SAMPLES * ADC_CHANNELS * 2] = {0};
-temp_t temp;
-
-void SystemClock_Config(void);
-temp_t procAdcBuf(uint16_t *buf);
+float ta;
+float tb;
+temp_t tempVal;
+uint16_t adcBuffer[ADC_SAMPLES * ADC_CHANNELS * 2] = {0};
 
 /**
   * @brief  The application entry point.
@@ -38,74 +64,94 @@ temp_t procAdcBuf(uint16_t *buf);
   */
 int main(void)
 {
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
   /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_DMA_Init();
   MX_GPIO_Init();
   MX_ADC1_Init();
-  MX_USART2_UART_Init();
   MX_TIM3_Init();
-
+  MX_USART2_UART_Init();
+  
+  calibrateTempSensor();
   HAL_TIM_Base_Start_IT(&htim3);
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t *) buf, sizeof(buf));
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *) adcBuffer, ADC_SAMPLES * ADC_CHANNELS * 2);
 
-  uint32_t curr = 0;
-  uint32_t prev = 0;
+  uint32_t now = 0;
+  uint32_t then = 0;
+
   while (1)
   {
-    curr = HAL_GetTick();
-    if(curr % 1000 == 0 && curr != prev) {
-      printf("Temperature: %f; Vref: %f\r\n", temp.temp, temp.vref);
-      prev = curr;
+    now = HAL_GetTick();
+    if(now - then == 1000) {
+      printf("(Temp,vRef,tempAvg,vRevAfg,vdda)=(%03.2f,%01.2f,%d,%d,%01.2f)\r\n", tempVal.temp, tempVal.vref, tempVal.tempAvg, tempVal.vrefAvg, tempVal.vdda);
+      then = now;
     }
-  }
+    /* USER CODE END WHILE */
 
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
 }
 
-temp_t procAdcBuf(uint16_t *buf) {
+void calibrateTempSensor() {
+  float x1 = (float) *TEMPSENSOR_CAL1_ADDR;
+  float x2 = (float) *TEMPSENSOR_CAL2_ADDR;
+  float y1 = (float) TEMPSENSOR_CAL1_TEMP;
+  float y2 = (float) TEMPSENSOR_CAL2_TEMP;
+
+  ta = (float) ((y2 - y1) / (x2 - x1));
+  tb = (float) ((x2 * y1 - x1 * y2) / (x2 - x1));
+}
+
+void processADCBuf(uint16_t *buffer) {
   uint32_t sum1 = 0;
   uint32_t sum2 = 0;
-  float tempCalc = 0.0;
-  float vrefCalc = 0.0;
-  float vrefVal = 0.0;
-  float tempVal = 0.0;
-  float tempValCalc = 0.0;
 
   for(int i = 0; i < ADC_SAMPLES; i++) {
-    sum1 += buf[i * 2]; // 0, 2, 4, 6, 8, ...
-    sum2 += buf[1 + i * 2]; // 1, 3, 5, 7, 9, ...
-    printf("Found temp %d with vref %d\r\n", buf[i * 2], buf[1 + i * 2]);
+    sum1 += buffer[i * 2];
+    sum2 += buffer[1 + i * 2];
   }
 
-  // Temp = ((Vsense - V25) / avgSlope) + 25
-  vrefCalc = (float) (sum2 / ADC_SAMPLES);
-  tempCalc = (float) ((((sum1 / ADC_SAMPLES - 0.76) / 2.5) + 25));
+  tempVal.tempAvg = sum1 / ADC_SAMPLES;
+  tempVal.vrefAvg = sum2 / ADC_SAMPLES;
+  tempVal.vdda = (float) VREFINT_CAL_VREF * (float) *VREFINT_CAL_ADDR / tempVal.vrefAvg / 1000;
+  tempVal.vref = (float) tempVal.vdda / ADC_RESOLUTION * tempVal.vrefAvg;
 
-  vrefVal = ADC_RES * ADC_INTREF / vrefCalc;
-  tempVal = tempCalc * vrefVal / ADC_RES;
-
-  tempValCalc =  ((tempVal - 0.76) / 2.5) + 25;
-  printf("Calculated temp, vref over %d samples: %03.1f, %03.1f\r\n", ADC_SAMPLES, tempValCalc, vrefVal);
-
-  temp.temp = tempCalc;
-  temp.vref = vrefCalc;
-
-  return temp;
+  tempVal.temp = (float) ta * tempVal.tempAvg + tb;
 }
 
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc) {
-  procAdcBuf(&buf[0]);
+  if(hadc->Instance == ADC1) {
+    processADCBuf(&adcBuffer[0]);
+  }
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-  procAdcBuf(&buf[ADC_SAMPLES * 2]);
+  if(hadc->Instance == ADC1) {
+    processADCBuf(&adcBuffer[ADC_CHANNELS * ADC_SAMPLES]);
+  }
 }
-
+  
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -152,16 +198,23 @@ void SystemClock_Config(void)
   }
 }
 
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
 /**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
 void Error_Handler(void)
 {
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
   {
   }
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -174,6 +227,9 @@ void Error_Handler(void)
   */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
