@@ -38,7 +38,7 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
 
-  adxl = ADXL_Init(CS_GPIO_Port, CS_Pin, &hspi1, A4G);
+  adxl = ADXL_Init(CS_GPIO_Port, CS_Pin, &hspi1, A16G);
   float gx;
   float gy;
   float gz;
@@ -66,7 +66,8 @@ int main(void)
   ADXL_Read(DEVID_ADDR, rxBuf, 1);
   printf("Device ID: 0x%02X\r\n", rxBuf[0]);
 
-  //ADXL_SelfTest();
+  ADXL_SelfTest();
+
   while (1)
   {
     ADXL_Read(DATAX0_ADDR, rxBuf, sizeof(rxBuf));

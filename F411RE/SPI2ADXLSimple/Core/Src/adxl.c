@@ -81,8 +81,7 @@ void ADXL_SelfTest() {
     avgZ = 0.0;
 
     ADXL_Write(BW_RATE_ADDR, BW_1600HZ); // Set BW_RATE > 100Hz
-    ADXL_Write(DATA_FORMAT_ADDR, 0b00001011); // Set range > 0x03
-    ADXL_Write(DATA_FORMAT_ADDR, 0b10000000); // Set ST on
+    ADXL_Write(DATA_FORMAT_ADDR, 0b10000000 | MEAS_BIT | adxl.accel); // Set range > 0x03
 
     // Read 10 ST on
     for(int j = 0; j < ST_COUNT + ST_SETTLE_COUNT; j++) {
@@ -97,6 +96,8 @@ void ADXL_SelfTest() {
         avgZ += buf[4] | buf[5] << 8;
     }
 
+    ADXL_Write(DATA_FORMAT_ADDR, MEAS_BIT | adxl.accel);
+
     adxl.xstOn = avgX / ST_COUNT;
     adxl.ystOn = avgY / ST_COUNT;
     adxl.zstOn = avgZ / ST_COUNT;
@@ -104,4 +105,8 @@ void ADXL_SelfTest() {
     adxl.xst = adxl.xstOn - adxl.xstOff;
     adxl.yst = adxl.ystOn - adxl.ystOff;
     adxl.zst = adxl.zstOn - adxl.zstOff;
+
+    ADXL_Write(OFSX_ADDR, adxl.xst);
+    ADXL_Write(OFSY_ADDR, adxl.yst);
+    ADXL_Write(OFSZ_ADDR, adxl.zst);
 }
