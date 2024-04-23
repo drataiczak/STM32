@@ -38,45 +38,56 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
 
-  adxl = ADXL_Init(CS_GPIO_Port, CS_Pin, &hspi1, A16G);
+  adxl = ADXL_Init(CS_GPIO_Port, CS_Pin, &hspi1, A4G);
   float gx;
   float gy;
   float gz;
   float scaler;
+  uint16_t resolution;
 
   switch(adxl.accel) {
     case A2G:
       scaler = ACC_2G_SCALER;
+      resolution = (RESOLUTION_10B / 2) - 1;
       break;
     case A4G:
       scaler = ACC_4G_SCALER;
+      resolution = (RESOLUTION_10B / 2) - 1;
       break;
     case A8G:
       scaler = ACC_8G_SCALER;
+      resolution = (RESOLUTION_11B / 2) - 1;
       break;
     case A16G:
       scaler = ACC_16G_SCALER;
+      resolution = (RESOLUTION_12B / 2) - 1;
       break;
     default:
       // Default to A4G
       scaler = ACC_4G_SCALER;
+      resolution = (RESOLUTION_10B / 2) - 1;
       break;
   }
 
   ADXL_Read(DEVID_ADDR, rxBuf, 1);
   printf("Device ID: 0x%02X\r\n", rxBuf[0]);
 
-  ADXL_SelfTest();
+  //ADXL_SelfTest();
 
   while (1)
   {
     ADXL_Read(DATAX0_ADDR, rxBuf, sizeof(rxBuf));
+    gx = (rxBuf[0] | rxBuf[1] << 8);
+    gx = rxBuf[1] > 0x80 ? ((~((uint16_t) gx) - 1) * scaler) / resolution : (gx * scaler) / resolution;
 
-    gx = (rxBuf[0] | rxBuf[1] << 8) * scaler;
-    gy = (rxBuf[2] | rxBuf[3] << 8) * scaler;
-    gz = (rxBuf[4] | rxBuf[5] << 8) * scaler;
-    
-    printf("gx=%f, gy=%f, gz=%f\r\n", gx, gy, gz);
+    gy = (rxBuf[2] | rxBuf[3] << 8);
+    gy = rxBuf[3] > 0x80 ? ((~((uint16_t) gy) - 1) * scaler) / resolution : (gy * scaler) / resolution;
+
+    gz = (rxBuf[4] | rxBuf[5] << 8);
+    gz = rxBuf[4] > 0x80 ? ((~((uint16_t) gz) - 1) * scaler) / resolution : (gz * scaler) / resolution;
+   
+    printf("gx=%02.2f, gy=%02.2f, gz=%02.2f\r\n", gx, gy, gz);
+
     HAL_Delay(200);
   }
   /* USER CODE END 3 */

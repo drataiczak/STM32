@@ -41,6 +41,23 @@ void ADXL_Read(uint8_t address, uint8_t *buf, size_t size) {
     HAL_GPIO_WritePin(adxl.port, adxl.pin, GPIO_PIN_SET);
 }
 
+float ADXL_ApplyCalibOffset(axis_t axis, float val) {
+    float offset = 0.0;
+    switch(axis) {
+        case X:
+            offset = adxl.xst;
+            break;
+        case Y:
+            offset = adxl.yst;
+            break;
+        case Z:
+            offset = adxl.zst;
+            break;
+    }
+
+    return val + offset;
+}
+
 adxl_t ADXL_Init(GPIO_TypeDef *csPort, uint16_t csPin, SPI_HandleTypeDef *hspi, accel_t accel) {
     adxl.port = csPort;
     adxl.pin = csPin;
@@ -67,9 +84,9 @@ void ADXL_SelfTest() {
     // Read 10 ST off
     for(int i = 0; i < ST_COUNT; i++) {
         ADXL_Read(DATAX0_ADDR, buf, sizeof(buf));
-        avgX += buf[0] | (buf[1] << 8);
-        avgY += buf[2] | (buf[3] << 8);
-        avgZ += buf[4] | (buf[5] << 8);
+        avgX += (buf[0] | (buf[1] << 8));
+        avgY += (buf[2] | (buf[3] << 8));
+        avgZ += (buf[4] | (buf[5] << 8));
     }
 
     adxl.xstOff = avgX / ST_COUNT;
@@ -91,9 +108,9 @@ void ADXL_SelfTest() {
             continue;
         }
         
-        avgX += buf[0] | buf[1] << 8;
-        avgY += buf[2] | buf[3] << 8;
-        avgZ += buf[4] | buf[5] << 8;
+        avgX += (buf[0] | (buf[1] << 8));
+        avgY += (buf[2] | (buf[3] << 8));
+        avgZ += (buf[4] | (buf[5] << 8));
     }
 
     ADXL_Write(DATA_FORMAT_ADDR, MEAS_BIT | adxl.accel);
@@ -105,8 +122,4 @@ void ADXL_SelfTest() {
     adxl.xst = adxl.xstOn - adxl.xstOff;
     adxl.yst = adxl.ystOn - adxl.ystOff;
     adxl.zst = adxl.zstOn - adxl.zstOff;
-
-    ADXL_Write(OFSX_ADDR, adxl.xst);
-    ADXL_Write(OFSY_ADDR, adxl.yst);
-    ADXL_Write(OFSZ_ADDR, adxl.zst);
 }

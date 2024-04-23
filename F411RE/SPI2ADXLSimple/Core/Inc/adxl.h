@@ -57,10 +57,15 @@ extern "C" {
 #define READ_OP 0x80
 #define MEAS_BIT 0x8
 
-#define ACC_2G_SCALER 0.0039
-#define ACC_4G_SCALER 0.0078
-#define ACC_8G_SCALER 0.0156
-#define ACC_16G_SCALER 0.312
+#define ACC_2G_SCALER (0.0039)
+#define ACC_4G_SCALER (0.0078)
+#define ACC_8G_SCALER (0.0156)
+#define ACC_16G_SCALER (0.312)
+
+#define RESOLUTION_10B 1024
+#define RESOLUTION_11B 2048
+#define RESOLUTION_12B 4096
+#define RESOLUTION_13B 8192
 
 #define ST_COUNT 10
 #define ST_SETTLE_COUNT 4
@@ -71,6 +76,12 @@ typedef enum Accel {
     A8G = 2,
     A16G = 3
 } accel_t;
+
+typedef enum Axis {
+    X = 0,
+    Y = 1,
+    Z = 2
+} axis_t;
 
 typedef struct ADXL {
     GPIO_TypeDef *port;
@@ -92,6 +103,7 @@ adxl_t ADXL_Init(GPIO_TypeDef *csPort, uint16_t csPin, SPI_HandleTypeDef *hspi, 
 void ADXL_Write(uint8_t address, uint8_t value);
 void ADXL_Read(uint8_t address, uint8_t *buf, size_t size);
 void ADXL_SelfTest();
+float ADXL_ApplyCalibOffset(axis_t axis, float val);
 
 #ifdef __cplusplus
 }
