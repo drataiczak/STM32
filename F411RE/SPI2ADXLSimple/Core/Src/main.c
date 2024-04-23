@@ -37,20 +37,46 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
- 
-  adxl = ADXL_Init(CS_GPIO_Port, CS_Pin, &hspi1);
+
+  adxl = ADXL_Init(CS_GPIO_Port, CS_Pin, &hspi1, A4G);
   float gx;
   float gy;
   float gz;
+  float scaler;
 
+  switch(adxl.accel) {
+    case A2G:
+      scaler = ACC_2G_SCALER;
+      break;
+    case A4G:
+      scaler = ACC_4G_SCALER;
+      break;
+    case A8G:
+      scaler = ACC_8G_SCALER;
+      break;
+    case A16G:
+      scaler = ACC_16G_SCALER;
+      break;
+    default:
+      // Default to A4G
+      scaler = ACC_4G_SCALER;
+      break;
+  }
+
+  ADXL_Read(DEVID_ADDR, rxBuf, 1);
+  printf("Device ID: 0x%02X\r\n", rxBuf[0]);
+
+  //ADXL_SelfTest();
   while (1)
   {
-    ADXL_Read(0x32, rxBuf, sizeof(rxBuf));
-    gx = (rxBuf[1] << 8 | rxBuf[0]) * 0.0078;
-    gy = (rxBuf[3] << 8 | rxBuf[2]) * 0.0078;
-    gz = (rxBuf[5] << 8 | rxBuf[4]) * 0.0078;
+    ADXL_Read(DATAX0_ADDR, rxBuf, sizeof(rxBuf));
 
+    gx = (rxBuf[0] | rxBuf[1] << 8) * scaler;
+    gy = (rxBuf[2] | rxBuf[3] << 8) * scaler;
+    gz = (rxBuf[4] | rxBuf[5] << 8) * scaler;
+    
     printf("gx=%f, gy=%f, gz=%f\r\n", gx, gy, gz);
+    HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }
