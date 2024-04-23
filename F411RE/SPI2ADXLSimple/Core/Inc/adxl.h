@@ -38,29 +38,29 @@ extern "C" {
 #define FIFO_CTL_ADDR       0x38
 #define FIFO_STATUS_ADDR    0x39
 
-#define DEVID_RESET         0b11100101
-#define BW_RATE_RESET       0b00001010
-#define INT_SOURCE_RESET    0b00000010
+#define DEVID_RESET         0xE5
+#define BW_RATE_RESET       0x0A
+#define INT_SOURCE_RESET    0x02
 
-#define BW_3_125HZ  0b0110
-#define BW_6_25HZ   0b0111
-#define BW_12_5HZ   0b1000
-#define BW_25HZ     0b1001
-#define BW_50HZ     0b1010
-#define BW_100HZ    0b1011
-#define BW_200HZ    0b1100
-#define BW_400HZ    0b1101
-#define BW_800HZ    0b1110
-#define BW_1600HZ   0b1111
+#define BW_3_125HZ  0x06
+#define BW_6_25HZ   0x07
+#define BW_12_5HZ   0x08
+#define BW_25HZ     0x09
+#define BW_50HZ     0x0A
+#define BW_100HZ    0x0B
+#define BW_200HZ    0x0C
+#define BW_400HZ    0x0D
+#define BW_800HZ    0x0E
+#define BW_1600HZ   0x0F
 
 #define MULTIBYTE_EN 0x40
 #define READ_OP 0x80
 #define MEAS_BIT 0x8
 
-#define ACC_2G_SCALER (0.0039)
-#define ACC_4G_SCALER (0.0078)
-#define ACC_8G_SCALER (0.0156)
-#define ACC_16G_SCALER (0.312)
+#define ACC_2G_SCALER ((float) 1/256)
+#define ACC_4G_SCALER ((float) 1/128)
+#define ACC_8G_SCALER ((float) 1/64)
+#define ACC_16G_SCALER ((float) 1/32)
 
 #define RESOLUTION_10B 1024
 #define RESOLUTION_11B 2048
@@ -102,8 +102,6 @@ typedef struct ADXL {
 adxl_t ADXL_Init(GPIO_TypeDef *csPort, uint16_t csPin, SPI_HandleTypeDef *hspi, accel_t accel);
 void ADXL_Write(uint8_t address, uint8_t value);
 void ADXL_Read(uint8_t address, uint8_t *buf, size_t size);
-void ADXL_SelfTest();
-float ADXL_ApplyCalibOffset(axis_t axis, float val);
 
 #ifdef __cplusplus
 }
